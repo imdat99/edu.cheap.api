@@ -11,6 +11,11 @@ enum Role {
     TEACHER = 1;
     STUDENT = 3;
 }
+enum MutationType {
+    CREATE = 0;
+    UPDATE = 1;
+    DELETE = 2;
+}
 message User {
     string id = 1;
     string name = 2;
@@ -50,11 +55,21 @@ message Lesson {
     string content = 5;
     int32 order_index = 6;
 }
-message CreateUserRequest {
-    string user = 1;
-    string password = 2;
-    Role role = 3;
-    string email = 4;
+message UserRequest {
+    MutationType mutation_type = 1;
+    optional string id = 2;
+    optional string name = 3;
+    optional string email = 4;
+    optional Role role = 5;
+    optional string password_hash = 6;
+}
+message CourseRequest {
+    MutationType mutation_type = 1;
+    optional string id = 2;
+    optional string teacher_id = 3;
+    optional string title = 4;
+    optional string description = 5;
+    optional float price = 6;
 }
 message MutationResponse {
     bool success = 1;
@@ -62,16 +77,12 @@ message MutationResponse {
 }
 service CourseService {
     // User
-    rpc CreateUser(CreateUserRequest) returns (User) {}
+    rpc MutationUser(UserRequest) returns (MutationResponse) {}
     rpc GetUsers(GetUserRequest) returns (GetUserResponse) {}
-    rpc UpdateUser(UpdateUserRequest) returns (bool) {}
-    rpc DeleteUser(string) returns (MutationResponse) {}
     rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {}
     // Course
-    rpc CreateCourse(CreateCourseRequest) returns (CreateCourseResponse) {}
+    rpc MutationCourse(CourseRequest) returns (MutationResponse) {}
     rpc GetCourses(GetCourseRequest) returns (GetCourseResponse) {}
-    rpc UpdateCourse(UpdateCourseRequest) returns (UpdateCourseResponse) {}
-    rpc DeleteCourse(DeleteCourseRequest) returns (DeleteCourseResponse) {}
     rpc ListCourses(ListCoursesRequest) returns (ListCoursesResponse) {}
     // CourseCategory
     rpc CreateCourseCategory(CreateCourseCategoryRequest) returns (CreateCourseCategoryResponse) {}
