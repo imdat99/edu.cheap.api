@@ -32,6 +32,8 @@ message Course {
     float price = 5;
     google.protobuf.Timestamp created_at = 6;
     google.protobuf.Timestamp updated_at = 7;
+    repeated CourseCategory course_categories = 8;
+    repeated Chapter chapters = 9;
 }
 
 message CourseCategory {
@@ -45,6 +47,7 @@ message Chapter {
     string course_id = 2;
     string title = 3;
     int32 order_index = 4;
+    repeated Lesson lessons = 5;
 }
 
 message Lesson {
@@ -52,8 +55,19 @@ message Lesson {
     string course_id = 2;
     string chapter_id = 3;
     string title = 4;
-    string content = 5;
+    repeated Content contents = 5;
     int32 order_index = 6;
+}
+message Content {
+    string id = 1;
+    string content = 3;
+    google.protobuf.Timestamp created_at = 4;
+    google.protobuf.Timestamp updated_at = 5;
+}
+message ContentMutation {
+    MutationType mutation_type = 1;
+    optional string id = 2;
+    optional string content = 3;
 }
 message UserRequest {
     MutationType mutation_type = 1;
@@ -70,11 +84,57 @@ message CourseRequest {
     optional string title = 4;
     optional string description = 5;
     optional float price = 6;
+    repeated CourseCategory course_categories = 7;
+    repeated ChapterRequest chapters = 8;
+    bool has_course_category = 9;
 }
+
+message ChapterRequest {
+    MutationType mutation_type = 1;
+    optional string id = 2;
+    optional string course_id = 3;
+    optional string title = 4;
+    optional int32 order_index = 5;
+    repeated LessonRequest lessons = 6;
+}
+
+message LessonRequest {
+    MutationType mutation_type = 1;
+    optional string id = 2;
+    optional string course_id = 3;
+    optional string chapter_id = 4;
+    optional string title = 5;
+    optional string content = 6;
+    optional int32 order_index = 7;
+    repeated ContentMutation contents = 8;
+}
+
 message MutationResponse {
     bool success = 1;
     string id = 2;
 }
+message CategoryRequest {
+    MutationType mutation_type = 1;
+    optional string id = 2;
+    optional string name = 3;
+    optional string description = 4;
+}
+message GetUserRequest {
+    repeated string ids = 1;
+    optional string email = 2;
+    optional string name = 3;
+    optional Role role = 4;
+}
+message GetCourseRequest {
+    repeated string ids = 1;
+    optional string title = 2;
+
+
+}
+message GetUserResponse {
+    repeated User users = 1;
+}
+
 service CourseService {
     // User
     rpc MutationUser(UserRequest) returns (MutationResponse) {}
@@ -85,21 +145,15 @@ service CourseService {
     rpc GetCourses(GetCourseRequest) returns (GetCourseResponse) {}
     rpc ListCourses(ListCoursesRequest) returns (ListCoursesResponse) {}
     // CourseCategory
-    rpc CreateCourseCategory(CreateCourseCategoryRequest) returns (CreateCourseCategoryResponse) {}
-    rpc GetCourseCategories(GetCourseCategoryRequest) returns (GetCourseCategoryResponse) {}
-    rpc UpdateCourseCategory(UpdateCourseCategoryRequest) returns (UpdateCourseCategoryResponse) {}
-    rpc DeleteCourseCategory(DeleteCourseCategoryRequest) returns (DeleteCourseCategoryResponse) {}
+    // rpc GetCourseCategories(GetCourseCategoryRequest) returns (GetCourseCategoryResponse) {}
+    rpc MutationCourseCategory(CategoryRequest) returns (MutationResponse) {}
     rpc ListCourseCategories(ListCourseCategoriesRequest) returns (ListCourseCategoriesResponse) {}
     // Chapter
-    rpc CreateChapter(CreateChapterRequest) returns (CreateChapterResponse) {}
-    rpc GetChapters(GetChapterRequest) returns (GetChapterResponse) {}
-    rpc UpdateChapter(UpdateChapterRequest) returns (UpdateChapterResponse) {}
-    rpc DeleteChapter(DeleteChapterRequest) returns (DeleteChapterResponse) {}
-    rpc ListChapters(ListChaptersRequest) returns (ListChaptersResponse) {}
-    /// Lesson
-    rpc CreateLesson(CreateLessonRequest) returns (CreateLessonResponse) {}
-    rpc GetLessons(GetLessonRequest) returns (GetLessonResponse) {}
-    rpc UpdateLesson(UpdateLessonRequest) returns (UpdateLessonResponse) {}
-    rpc DeleteLesson(DeleteLessonRequest) returns (DeleteLessonResponse) {}
-    rpc ListLessons(ListLessonsRequest) returns (ListLessonsResponse) {}
+    // rpc GetChapters(GetChapterRequest) returns (GetChapterResponse) {}
+    // rpc MutationChapter(ChapterRequest) returns (MutationResponse) {}
+    // rpc ListChapters(ListChaptersRequest) returns (ListChaptersResponse) {}
+    // /// Lesson
+    // rpc GetLessons(GetLessonRequest) returns (GetLessonResponse) {}
+    // rpc MutationLesson(LessonRequest) returns (MutationResponse) {}
+    // rpc ListLessons(ListLessonsRequest) returns (ListLessonsResponse) {}
 }
